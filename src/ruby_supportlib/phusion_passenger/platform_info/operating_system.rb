@@ -161,12 +161,12 @@ module PhusionPassenger
         major, minor, *rest = os_version.split(".").map(&:to_i)
         if major >= 11 || (major == 10 && minor >= 16)
           # Since Big Sur aarch64 is supported, and default on m1 macs.
-          if `uname -m` =~ /arm64/
-            ["arm", "x86_64"]
+          if `#{uname_command} -m` =~ /arm64/
+            ["arm64", "x86_64"]
           elsif `sysctl -in sysctl.proc_translated` == "1"
-            ["arm", "x86_64"]
+            ["arm64", "x86_64"]
           else
-            ["x86_64", "arm"]
+            ["x86_64", "arm64"]
           end
         elsif minor == 15
           # Since Catalina x86 is gone.
@@ -247,7 +247,7 @@ module PhusionPassenger
     memoize :supports_lfence_instruction?, true
 
     def self.requires_no_tls_direct_seg_refs?
-      return File.exists?("/proc/xen/capabilities") && cpu_architectures[0] == "x86"
+      return File.exist?("/proc/xen/capabilities") && cpu_architectures[0] == "x86"
     end
     memoize :requires_no_tls_direct_seg_refs?, true
 
